@@ -1,0 +1,21 @@
+{
+    "name": "apanly/metaweblog",
+    "description": "通过MetaWeblog协议同时管理51cto,csdn,sina,163,oschina,cnblogs等博客",
+    "keywords": ["metaweblog", "51cto", "csdn", "oschina", "sina","cnblogs","同步博文"],
+    "authors": [
+        {
+            "name": "apanly",
+            "email": "apanly@163.com"
+        }
+    ],
+    "homepage":"http://www.vincentguo.cn",
+    "license":"MIT",
+    "require": {
+        "php": "^5.3.3 || ^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "apanly\\MetaWeblog\\": "src"
+        }
+    }
+}
