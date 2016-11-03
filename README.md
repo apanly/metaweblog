@@ -10,6 +10,20 @@ MetaWeblog
 
 ### 使用
     
+    $url = "https://my.oschina.net/action/xmlrpc";
+    $target = new \apanly\metaweblog\MetaWeblog( $url );
+    $target->setAuth( $username,$passwd );
+    
+    $params = [
+        'title'=> $title,
+        'description'=> $content,
+        'categories'=> $catlog
+    ];
+            
+    $target->newPost( $params );
+    $blog_id = $target->getResponse();
+    
+    $target->editPost(  $blog_id ,$params );
     
     
 
