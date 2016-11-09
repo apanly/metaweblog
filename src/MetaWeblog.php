@@ -21,6 +21,7 @@ class MetaWeblog {
     private  $blog_id = "1";
     private  $metaweblog_response = null;
     private  $error = null;
+    private  $response = null;
     private  $header = [
         "Accept" => "*/*",
         "Accept-Language" => 'zh-CN, en-US, en, *',
@@ -132,6 +133,7 @@ class MetaWeblog {
             return false;
         }
         curl_close($ch);
+        $this->response = $response;
         return $response;
     }
 
@@ -144,10 +146,7 @@ class MetaWeblog {
 	}
 
     public function getResponse(){
-    	if( $this->metaweblog_response ){
-			return $this->metaweblog_response->getMessage();
-		}
-		return false;
+		return $this->response;
     }
 
 	public function isError(){
