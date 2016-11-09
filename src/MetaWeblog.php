@@ -40,6 +40,7 @@ class MetaWeblog extends BaseService {
     }
 
 	/**
+	 * 设置认证信息
 	 * @param $username 用户名
 	 * @param $passwd 密码
 	 */
