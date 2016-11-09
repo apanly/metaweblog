@@ -67,6 +67,11 @@ class MetaWeblog {
 		}
         $this->buildXML( $params );
         $res_xml = $this->doPost();;
+		if( !$res_xml ){
+			$this->error = new MetaWeblog_Error(-32700, 'response is empty');
+			return false;
+		}
+
         $this->metaweblog_response = new MetaWeblog_Message( $res_xml );
         if( !$this->metaweblog_response->parse() ){
             $this->error = new MetaWeblog_Error(-32700, 'parse error. not well formed');
@@ -98,6 +103,11 @@ class MetaWeblog {
         $this->method = "metaWeblog.editPost";
         $this->buildXML( $params );
         $res_xml = $this->doPost();;
+        if( !$res_xml ){
+			$this->error = new MetaWeblog_Error(-32700, 'response is empty');
+			return false;
+		}
+
         $this->metaweblog_response = new MetaWeblog_Message( $res_xml );
         if( !$this->metaweblog_response->parse() ){
             $this->error = new MetaWeblog_Error(-32700, 'parse error. not well formed');
@@ -145,9 +155,13 @@ class MetaWeblog {
 		$this->blog_id = $blog_id;
 	}
 
-    public function getResponse(){
-		return $this->response;
+    public function getXml(){
+		return $this->xml;
     }
+
+    public function getResponse(){
+    	return $this->response;
+	}
 
 	public function isError(){
         return (is_object($this->error));
