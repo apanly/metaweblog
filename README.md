@@ -3,6 +3,14 @@ MetaWeblog
 ###主要作用
 * 通过MetaWeblog协议同时管理51cto,csdn,sina,163,oschina,cnblogs等博客
 
+###支持博客
+* 51cto
+* csdn
+* sina
+* 163
+* oschina
+* cnblogs
+* chinaunix
 
 ###主要功能
 * 实现了发表新文章
