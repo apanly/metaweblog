@@ -54,8 +54,8 @@ MetaWeblog
     }
     
 ###截图
-*![新文章](./static/test_1.jpg)
-*![编辑文章](./static/test_2.jpg)
+* ![新文章](./static/test_1.jpg)
+* ![编辑文章](./static/test_2.jpg)
     
 ###ToDoList
 * 目前代码比较冗余，后续改的更优雅点
