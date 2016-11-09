@@ -63,7 +63,6 @@ MetaWeblog
 ###Lecense
 PHP Browser is licensed under [The MIT License (MIT)](LICENSE).
 
-
 ###参考资料
 * [MetaWeblog 同时管理51cto,csdn,sina,163,oschina,cnblogs等博客](http://www.vincentguo.cn/default/91)
 
