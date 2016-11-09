@@ -3,6 +3,7 @@ MetaWeblog
 ###主要作用
 * 通过MetaWeblog协议同时管理51cto,csdn,sina,163,oschina,cnblogs等博客
 
+
 ###主要功能
 * 实现了发表新文章
 * 实现了编辑文章
@@ -28,7 +29,8 @@ MetaWeblog
     
     $target->editPost(  $blog_id ,$params );
     
-    
+###ToDoList
+* 目前代码比较冗余，后续改的更优雅点
 
 ###Lecense
 PHP Browser is licensed under [The MIT License (MIT)](LICENSE).
