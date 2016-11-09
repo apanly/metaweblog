@@ -11,7 +11,7 @@ metaWeblog.editPost (postid, username, password, struct, publish) 返回一个Bo
  *
  * 综上 本库只是先了newPost 和 editPost 其他的未实现，也不打算实现了
 **/
-class MetaWeblog extends BaseService {
+class MetaWeblog {
     private  $xml = '';
     private  $method = "";//默认发布新文章
     private  $url = "";
@@ -19,7 +19,7 @@ class MetaWeblog extends BaseService {
     private  $username = "";
     private  $passwd = "";
     private  $blog_id = "1";
-    private  $metaweblog_message = null;
+    private  $metaweblog_response = null;
     private  $error = null;
     private  $header = [
         "Accept" => "*/*",
@@ -66,16 +66,18 @@ class MetaWeblog extends BaseService {
 		}
         $this->buildXML( $params );
         $res_xml = $this->doPost();;
-        $this->metaweblog_message = new MetaWeblog_Message( $res_xml );
-        if( !$this->metaweblog_message->parse() ){
+        $this->metaweblog_response = new MetaWeblog_Message( $res_xml );
+        if( !$this->metaweblog_response->parse() ){
             $this->error = new MetaWeblog_Error(-32700, 'parse error. not well formed');
             return false;
         }
 
-        if ($this->metaweblog_message->messageType == 'fault') {
-            $this->error = new MetaWeblog_Error($this->metaweblog_message->faultCode, $this->metaweblog_message->faultString);
+        if ($this->metaweblog_response->messageType == 'fault') {
+            $this->error = new MetaWeblog_Error($this->metaweblog_response->faultCode, $this->metaweblog_response->faultString);
             return false;
         }
+
+        $this->setBlogId( $this->metaweblog_response->params[0] );
 
         return true;
     }
@@ -95,14 +97,14 @@ class MetaWeblog extends BaseService {
         $this->method = "metaWeblog.editPost";
         $this->buildXML( $params );
         $res_xml = $this->doPost();;
-        $this->metaweblog_message = new MetaWeblog_Message( $res_xml );
-        if( !$this->metaweblog_message->parse() ){
+        $this->metaweblog_response = new MetaWeblog_Message( $res_xml );
+        if( !$this->metaweblog_response->parse() ){
             $this->error = new MetaWeblog_Error(-32700, 'parse error. not well formed');
             return false;
         }
 
-        if ($this->metaweblog_message->messageType == 'fault') {
-            $this->error = new MetaWeblog_Error($this->metaweblog_message->faultCode, $this->metaweblog_message->faultString);
+        if ($this->metaweblog_response->messageType == 'fault') {
+            $this->error = new MetaWeblog_Error($this->metaweblog_response->faultCode, $this->metaweblog_response->faultString);
             return false;
         }
 
@@ -130,25 +132,33 @@ class MetaWeblog extends BaseService {
             return false;
         }
         curl_close($ch);
-
-        $log = \Yii::$app->getRuntimePath().DIRECTORY_SEPARATOR.'curl.log';
-        file_put_contents($log,date('Y-m-d H:i:s')."  url: {$this->url} \nmethod: {$this->method} \ndata: {$this->xml} \nresult: {$response} \n",FILE_APPEND);
         return $response;
     }
 
-    function getResponse(){
-        return $this->metaweblog_message->params[0];
+    public function getBlogId(){
+		return $this->blog_id;
+	}
+
+	private function setBlogId( $blog_id ){
+		$this->blog_id = $blog_id;
+	}
+
+    public function getResponse(){
+    	if( $this->metaweblog_response ){
+			return $this->metaweblog_response->getMessage();
+		}
+		return false;
     }
 
-    function isError(){
+	public function isError(){
         return (is_object($this->error));
     }
 
-    function getErrorCode(){
+	public function getErrorCode(){
         return $this->error->code;
     }
 
-    function getErrorMessage(){
+	public function getErrorMessage(){
         return $this->error->message;
     }
 
@@ -256,201 +266,6 @@ EOD;
     }
 }
 
-class  MetaWeblog_Request{
-    private $xml = '';
-    private $charset = "utf-8";
-    private $method = "";
-    private $blog_id = "1";
-    private $username = "";
-    private $passwd = "";
-    private $post_data = [];
-
-    /**
-     * params = [
-     *      'charset' => 'utf-8',
-     *      'method' =>  metaWeblog.newPost/metaWeblog.editPost/metaWeblog.getPost,
-     *      'blog_id' => '1',
-     *      'username' => 'xxxx',
-     *      'passwd' => 'xxxxx',
-     *      'post_data' => [
-     *          'title' => '',
-     *          'description' => '',
-     *          'categories' => []
-     *      ]
-     * ];
-     */
-    public function __construct( $params  ){
-        $this->charset = $params['charset'];
-        $this->method = $params['method'];
-        $this->blog_id = $params['blog_id'];
-        $this->username = $params['username'];
-        $this->passwd = $params['passwd'];
-        $this->post_data = $params['post_data'];
-        $this->buildXML( $this->post_data );
-    }
-
-    private function buildXML($params ){
-        $this->xml = <<<EOD
-<?xml version="1.0" encoding="{$this->charset}"?>
-<methodCall>
-<methodName>{$this->method}</methodName>
-<params>
-    <param>
-        <value>
-        <string>{$this->blog_id}</string>
-        </value>
-    </param>
-    <param>
-        <value>
-        <string>{$this->username}</string>
-        </value>
-    </param>
-    <param>
-        <value>
-        <string>{$this->passwd}</string>
-        </value>
-    </param>
-EOD;
-        $this->xml .= $this->buildBody( $params );
-        $this->xml .= <<<EOT
-
-    <param>
-       <value>
-        <boolean>1</boolean>
-       </value>
-    </param>
-EOT;
-
-        $this->xml .= <<<EOT
-
-</params></methodCall>
-EOT;
-    }
-
-    private function buildBody( $params ){
-        $xml = <<<EOD
-
-    <param>
-       <value>
-        <struct>
-EOD;
-        foreach( $params as $_key => $_val ){
-            if( is_array( $_val ) ){
-                $xml .= $this->buildMainArr( $_key,$_val );
-            }else{
-                $xml .= <<<EOD
-
-            <member>
-              <name>{$_key}</name>
-              <value>
-                <string>{$_val}</string>
-              </value>
-            </member>
-EOD;
-            }
-
-
-        }
-
-        $xml .= <<<EOD
-
-        </struct>
-       </value>
-    </param>
-EOD;
-
-        return  $xml;
-    }
-
-    private function buildMainArr($name,$data){
-        $xml = <<<EOD
-
-            <member>
-                <name>{$name}</name>
-                <value>
-                  <array>
-                    <data>
-EOD;
-        foreach( $data as $_val ){
-            $xml .= <<<EOD
-
-                        <value>
-                            <string>{$_val}</string>
-                        </value>
-EOD;
-        }
-
-        $xml .= <<<EOD
-
-                     </data>
-                   </array>
-                  </value>
-            </member>
-EOD;
-        return $xml;
-
-
-    }
-
-    function getLength(){
-        return strlen($this->xml);
-    }
-
-    function getXml(){
-        return $this->xml;
-    }
-}
-
-class MetaWeblog_Value {
-    var $data;
-    var $type;
-
-    public function  __contruct($data, $type = false){
-
-    }
-
-    function getXml(){
-        // Return XML for this value
-        switch ($this->type) {
-            case 'boolean':
-                return '<boolean>'.(($this->data) ? '1' : '0').'</boolean>';
-                break;
-            case 'int':
-                return '<int>'.$this->data.'</int>';
-                break;
-            case 'double':
-                return '<double>'.$this->data.'</double>';
-                break;
-            case 'string':
-                return '<string>'.htmlspecialchars($this->data).'</string>';
-                break;
-            case 'array':
-                $return = '<array><data>'."\n";
-                foreach ($this->data as $item) {
-                    $return .= '  <value>'.$item->getXml()."</value>\n";
-                }
-                $return .= '</data></array>';
-                return $return;
-                break;
-            case 'struct':
-                $return = '<struct>'."\n";
-                foreach ($this->data as $name => $value) {
-                    $name = htmlspecialchars($name);
-                    $return .= "  <member><name>$name</name><value>";
-                    $return .= $value->getXml()."</value></member>\n";
-                }
-                $return .= '</struct>';
-                return $return;
-                break;
-            case 'date':
-            case 'base64':
-                return $this->data->getXml();
-                break;
-        }
-        return false;
-    }
-}
-
 
 class  MetaWeblog_Message{
 
@@ -551,10 +366,10 @@ class  MetaWeblog_Message{
                 $value = (string)trim($this->_currentTagContents);
                 $valueFlag = true;
                 break;
-            case 'dateTime.iso8601':
-                $value = new IXR_Date(trim($this->_currentTagContents));
-                $valueFlag = true;
-                break;
+//            case 'dateTime.iso8601':
+//                $value = new IXR_Date(trim($this->_currentTagContents));
+//                $valueFlag = true;
+//                break;
             case 'value':
                 // "If no type is indicated, the type is string."
                 if (trim($this->_currentTagContents) != '') {
@@ -605,6 +420,10 @@ class  MetaWeblog_Message{
         }
         $this->_currentTagContents = '';
     }
+
+    public function getMessage(){
+    	return $this->message;
+	}
 }
 
 
@@ -639,28 +458,4 @@ class MetaWeblog_Error{
 EOD;
         return $xml;
     }
-}
-
-
-class BaseService {
-	protected static $_error_msg = null;
-	protected static $_error_code = null;
-	public static function _err($msg='',$code = -1){
-		if($msg){
-			self::$_error_msg = $msg;
-		}else{
-			self::$_error_msg = '操作失败';
-		}
-		self::$_error_code = $code;
-		return false;
-	}
-
-	public static function getLastErrorMsg(){
-		return self::$_error_msg?self::$_error_msg:"";
-	}
-
-
-	public static function getLastErrorCode(){
-		return self::$_error_code?self::$_error_code:0;
-	}
 }
