@@ -1,8 +1,16 @@
 <?php
 namespace apanly\metaweblog;
-
-
-
+/**
+ MetaWeblog API中文说明
+1、什么是MetaWeblog API？
+MetaWeblog API（MWA）是一个Blog程序接口标准，允许外部程序来获取或者设置Blog的文字和熟悉。他建立在XMLRPC接口之上，并且已经有了很多的实现。
+2、基本的函数规范
+metaWeblog.newPost (blogid, username, password, struct, publish) 返回一个字符串，可能是Blog的ID。
+metaWeblog.editPost (postid, username, password, struct, publish) 返回一个Boolean值，代表是否修改成功。
+其中blogid、username、password分别代表Blog的id（注释：如果你有两个Blog，blogid指定你需要编辑的blog）、用户名和密码。
+ *
+ * 综上 本库只是先了newPost 和 editPost 其他的未实现，也不打算实现了
+**/
 class MetaWeblog extends BaseService {
     private  $xml = '';
     private  $method = "";//默认发布新文章
@@ -20,27 +28,36 @@ class MetaWeblog extends BaseService {
         'User-Agent' => 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Windows Live Writer 1.0)',
     ];
 
-    /*
-     MetaWeblog API中文说明
-    1、什么是MetaWeblog API？
-    MetaWeblog API（MWA）是一个Blog程序接口标准，允许外部程序来获取或者设置Blog的文字和熟悉。他建立在XMLRPC接口之上，并且已经有了很多的实现。
-    2、基本的函数规范
-    有三个基本的函数规范：
-    metaWeblog.newPost (blogid, username, password, struct, publish) 返回一个字符串，可能是Blog的ID。
-    metaWeblog.editPost (postid, username, password, struct, publish) 返回一个Boolean值，代表是否修改成功。
-    metaWeblog.getPost (postid, username, password) 返回一个Struct。
-    其中blogid、username、password分别代表Blog的id（注释：如果你有两个Blog，blogid指定你需要编辑的blog）、用户名和密码。
-     * */
+
+	/**
+	 * MetaWeblog constructor.
+	 * @param $url api地址
+	 * @param string $charset
+	 */
     public function __construct( $url,$charset = "utf-8" ){
         $this->url = $url;
         $this->charset = $charset;
     }
 
+	/**
+	 * @param $username 用户名
+	 * @param $passwd 密码
+	 */
     public function setAuth($username,$passwd){
         $this->username = $username;
         $this->passwd = $passwd;
     }
 
+	/**
+	 * 发表新文章
+	 * @param  $params 数组
+	 * [
+	 * 		'title' => '文章标题',
+	 * 		'description' => '文章内容',
+	 * 		'categories' => '类别，是一个数组'
+	 * ]
+	 * @param  $is_csdn 是不是发到csdn网站
+	 */
     public function newPost( $params,$is_csdn = false ){
         $this->method = "metaWeblog.newPost";
         if( $is_csdn ){//csdn要特殊处理下
@@ -62,6 +79,16 @@ class MetaWeblog extends BaseService {
         return true;
     }
 
+	/**
+	 * 编辑文章
+	 * @param $blog_id
+	 * @param  $params 数组
+	 * [
+	 * 		'title' => '文章标题',
+	 * 		'description' => '文章内容',
+	 * 		'categories' => '类别，是一个数组'
+	 * ]
+	 */
     public function editPost( $blog_id,$params ){
         $this->blog_id = $blog_id;
         $this->method = "metaWeblog.editPost";
@@ -107,7 +134,6 @@ class MetaWeblog extends BaseService {
         file_put_contents($log,date('Y-m-d H:i:s')."  url: {$this->url} \nmethod: {$this->method} \ndata: {$this->xml} \nresult: {$response} \n",FILE_APPEND);
         return $response;
     }
-
 
     function getResponse(){
         return $this->metaweblog_message->params[0];
