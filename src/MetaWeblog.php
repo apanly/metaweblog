@@ -59,7 +59,7 @@ class MetaWeblog {
 	 * ]
 	 * @param  $is_csdn 是不是发到csdn网站
 	 */
-    public function newPost( $params,$is_csdn = false ){
+    public function newPost( array $params ,$is_csdn = false ){
         $this->method = "metaWeblog.newPost";
         if( $is_csdn ){//csdn要特殊处理下
         	$this->blog_id = 895030;
@@ -92,7 +92,7 @@ class MetaWeblog {
 	 * 		'categories' => '类别，是一个数组'
 	 * ]
 	 */
-    public function editPost( $blog_id,$params ){
+    public function editPost( $blog_id, array $params ){
         $this->blog_id = $blog_id;
         $this->method = "metaWeblog.editPost";
         $this->buildXML( $params );
