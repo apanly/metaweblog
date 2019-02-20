@@ -18,7 +18,7 @@ class MetaWeblog {
     private  $charset = "utf-8";
     private  $username = "";
     private  $passwd = "";
-    private  $blog_id = "1";
+    private  $blog_id = "default";
     private  $metaweblog_response = null;
     private  $error = null;
     private  $response = null;
