@@ -1,9 +1,9 @@
 MetaWeblog
 ===================
-###主要作用
+### 主要作用
 * 通过MetaWeblog协议同时管理51cto,csdn,sina,163,oschina,cnblogs等博客
 
-###支持博客
+### 支持博客
 * 51cto
 * csdn
 * sina
@@ -12,7 +12,7 @@ MetaWeblog
 * cnblogs
 * chinaunix
 
-###主要功能
+### 主要功能
 * 实现了发表新文章
 * 实现了编辑文章
 
@@ -53,17 +53,17 @@ MetaWeblog
     	}
     }
     
-###截图
+### 截图
 * ![新文章](./static/test_1.jpg)
 * ![编辑文章](./static/test_2.jpg)
     
-###ToDoList
+### ToDoList
 * 目前代码比较冗余，后续改的更优雅点
 
-###Lecense
+### Lecense
 PHP Browser is licensed under [The MIT License (MIT)](LICENSE).
 
-###参考资料
+### 参考资料
 * [MetaWeblog 同时管理51cto,csdn,sina,163,oschina,cnblogs等博客](http://www.54php.cn/default/91)
 
 
